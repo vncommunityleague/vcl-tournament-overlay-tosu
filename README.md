@@ -32,8 +32,7 @@ ___
 - Picks: Left click for P1, right click for P2
 - Bans: Shift + Left click for P1, Shift + Right click for P2
 - Reset map status: Ctrl + Click
-
-***Note:** Same as Lazer, bans must be done manually. You will also have to select who will have first pick.*
+> Note that bans are manual. Once done, you can set First Pick team in the Interact window to start the auto-pick process.
 
 ## Notes
 - To trigger the auto-switching between gameplay and mappool, **score announce message must contain `Next Pick: ...` phrase (case sensitive).** Of course with some code digging you can find where to change this.
