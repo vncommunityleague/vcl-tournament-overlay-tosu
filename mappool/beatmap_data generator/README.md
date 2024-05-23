@@ -7,6 +7,7 @@ This generator is not needed if you know how to fetch data from your mappooling 
 ## Presiquites & Instruction
 - Copy `beatmaps.json` from `mappool` folder to this folder
 - Install [NodeJS](https://nodejs.org/en/download/prebuilt-installer/current)
+- Open `index.js` and put your APIv1 key in `API_KEY` 
 - Open **Command Prompt** or **Terminal** window in this folder
 - Run `npm install`
 - Once finished, run `node index.js`
