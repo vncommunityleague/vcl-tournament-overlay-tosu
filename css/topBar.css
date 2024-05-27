@@ -112,8 +112,6 @@
 	display: flex;
 	height: 15px;
 	top: 60px;
-	/* padding-top: 5px;
-    padding-bottom: 5px; */
 	transition: ease-in-out 100ms;
 }
 
@@ -123,7 +121,6 @@
 }
 
 #scoreContainerRight {
-	/* justify-content: flex-end; */
 	right: 150px;
 }
 
@@ -131,7 +128,7 @@
 .scoreRight {
 	width: 40px;
 	height: 10px;
-	background-color: #fff;
+	background-color: rgba(255, 255, 255, 0.5);
 	transition: ease-in-out 100ms;
 	border-radius: 5px;
 }
@@ -142,6 +139,5 @@
 }
 
 .scoreRight {
-	/* flex-wrap: wrap-reverse; */
 	margin-left: 10px;
 }

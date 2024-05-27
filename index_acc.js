@@ -116,6 +116,23 @@ let leftScoreWidth, rightScoreWidth;
 let integratedMappool = 0;
 let tempIntegratedMappool;
 
+let staticBeatmapsData = [];
+(async () => {
+    if (staticBeatmapsData.length !== 0) {
+        return
+    }
+
+    $.ajaxSetup({ cache: false });
+
+    try {
+        staticBeatmapsData = await $.getJSON("./mappool/beatmap_data.json");
+        iFrameInitiate();
+        mappoolSetup = 1;
+    } catch (err) {
+        console.error(err)
+    }
+})();
+
 toMins = (time) => {
     let minutes = time.getUTCMinutes() >= 10 ? time.getUTCMinutes() : "0" + time.getUTCMinutes();
     let seconds = time.getUTCSeconds() >= 10 ? time.getUTCSeconds() : "0" + time.getUTCSeconds();
@@ -181,29 +198,33 @@ socket.onmessage = (event) => {
         nowPlayingContainer.style.backgroundImage = `url('http://127.0.0.1:24050/Songs/${data.menu.bm.path.full}?a=${Math.random(10000)}')`;
     }
     if (tempMapID !== data.menu.bm.id || tempSR !== data.menu.bm.stats.fullSR || tempLength !== data.menu.bm.time.full) {
-        tempMapID = data.menu.bm.id;
-        tempMapArtist = data.menu.bm.metadata.artist;
-        tempMapTitle = data.menu.bm.metadata.title;
-        tempMapDiff = data.menu.bm.metadata.difficulty;
-        tempMapper = data.menu.bm.metadata.mapper;
+        const beatmapData = extractBeatmapData(data.menu.bm);
 
-        tempCS = data.menu.bm.stats.CS;
-        tempAR = data.menu.bm.stats.AR;
-        tempOD = data.menu.bm.stats.OD;
-        tempHP = data.menu.bm.stats.HP;
-        tempSR = data.menu.bm.stats.fullSR;
-        tempLength = data.menu.bm.time.full;
-        let convertedLength = new Date(tempLength);
-        convertedLength = toMins(convertedLength);
+        tempMapID = beatmapData.map_id;
+        tempMapArtist = beatmapData.artist;
+        tempMapTitle = beatmapData.title;
+        tempMapDiff = beatmapData.diff_name;
+        tempMapper = beatmapData.mapper;
 
-        tempBPM = data.menu.bm.stats.BPM.max;
-        if (data.menu.bm.stats.BPM.max !== data.menu.bm.stats.BPM.min) tempBPM = `${data.menu.bm.stats.BPM.min} - ${data.menu.bm.stats.BPM.max}`;
+        tempCS = beatmapData.cs;
+        tempAR = beatmapData.ar;
+        tempOD = beatmapData.od;
+        tempSR = beatmapData.sr;
+        tempLength = beatmapData.drain;
+
+        if (!isNaN(beatmapData.drain)) {
+            let convertedLength = new Date(tempLength);
+            convertedLength = toMins(convertedLength);
+            tempLength = convertedLength;
+        }
+
+        tempBPM = beatmapData.bpm;
 
         mapName.innerHTML = tempMapArtist + " - " + tempMapTitle;
         mapDifficulty.innerHTML = `Difficulty: <span style="font-weight: 700">${tempMapDiff}</span>`;
         mapCreator.innerHTML = `Mapper: <span style="font-weight: 700">${tempMapper}</span>`;
         mapIndex.innerHTML = `CS: <span style="font-weight: 700">${tempCS}</span> / AR: <span style="font-weight: 700">${tempAR}</span> / OD: <span style="font-weight: 700">${tempOD}</span> / HP: <span style="font-weight: 700">${tempHP}</span></br>Star Rating: <span style="font-weight: 700">${tempSR}*</span>`;
-        mapTime.innerHTML = `Length: <span style="font-weight: 700">${convertedLength}</span></br>BPM: <span style="font-weight: 700">${tempBPM}</span>`;
+        mapTime.innerHTML = `Length: <span style="font-weight: 700">${tempLength}</span></br>BPM: <span style="font-weight: 700">${tempBPM}</span>`;
 
         setTimeout(() => {
             togglePool(false);
@@ -427,6 +448,40 @@ refresh.addEventListener("click", () => {
     });
     togglePool(true);
 });
+
+function extractBeatmapData(beatmapData) {
+    const beatmap = staticBeatmapsData.find((bmap) => bmap.map_id === beatmapData.id);
+
+    if (beatmap) {
+        return {
+            map_id: beatmap.map_id,
+            artist: beatmap.artist,
+            title: beatmap.title,
+            diff_name: beatmap.diff_name,
+            mapper: beatmap.mapper,
+            cs: beatmap.cs,
+            ar: beatmap.ar,
+            od: beatmap.od,
+            drain: beatmap.drain,
+            bpm: beatmap.bpm,
+            sr: beatmap.sr,
+        };
+    }
+
+    return  {
+        map_id: beatmapData.id,
+        artist: beatmapData.metadata.artist,
+        title: beatmapData.metadata.title,
+        diff_name: beatmapData.metadata.difficulty,
+        mapper: beatmapData.metadata.mapper,
+        cs: beatmapData.stats.CS,
+        ar: beatmapData.stats.AR,
+        od: beatmapData.stats.OD,
+        drain: beatmapData.time.full,
+        bpm: beatmapData.stats.BPM.common,
+        sr: beatmapData.stats.fullSR,
+    }
+}
 
 togglePool = (state) => {
     if (state) {

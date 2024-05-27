@@ -192,10 +192,11 @@ async function setupBeatmaps() {
   const bms = [];
   try {
     $.ajaxSetup({ cache: false });
-    const jsonData = await $.getJSON(`beatmap_data.json`);
+    const jsonData = await $.getJSON(`beatmaps.json`);
     jsonData.map((beatmap) => {
       bms.push(beatmap);
     });
+
   } catch (error) {
     console.error("Could not read JSON file", error);
   }
