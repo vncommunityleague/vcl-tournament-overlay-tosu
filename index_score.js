@@ -210,7 +210,7 @@ socket.onmessage = (event) => {
         mapName.innerHTML = tempMapArtist + " - " + tempMapTitle;
         mapDifficulty.innerHTML = `Difficulty: <span style="font-weight: 700">${tempMapDiff}</span>`;
         mapCreator.innerHTML = `Mapper: <span style="font-weight: 700">${tempMapper}</span>`;
-        mapIndex.innerHTML = `CS: <span style="font-weight: 700">${tempCS}</span> / AR: <span style="font-weight: 700">${tempAR}</span> / OD: <span style="font-weight: 700">${tempOD}</span> / HP: <span style="font-weight: 700">${tempHP}</span></br>Star Rating: <span style="font-weight: 700">${tempSR}*</span>`;
+        mapIndex.innerHTML = `CS: <span style="font-weight: 700">${tempCS}</span> / AR: <span style="font-weight: 700">${tempAR}</span> / OD: <span style="font-weight: 700">${tempOD}</span></span></br>Star Rating: <span style="font-weight: 700">${tempSR}*</span>`;
         mapTime.innerHTML = `Length: <span style="font-weight: 700">${tempLength}</span></br>BPM: <span style="font-weight: 700">${tempBPM}</span>`;
 
         setTimeout(() => {
