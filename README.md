@@ -1,4 +1,4 @@
-# VCL Tournament Overlay - Lazer edition by [Try-Z](https://osu.ppy.sh/users/8266808)
+# VCL Tournament Overlay - Lazer edition by [FukutoTojido](https://github.com/FukutoTojido)
 ___
 ## [**Overlay preview**](https://www.twitch.tv/videos/1445278730?collection=vyL2iPlp4xYysw&t=00h11m56s)
 
