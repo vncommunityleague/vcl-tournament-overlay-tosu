@@ -1,21 +1,35 @@
-[
-  { "beatmapId": 4534810, "mods": "NM" },
-  { "beatmapId": 3709823, "mods": "NM" },
-  { "beatmapId": 2655469, "mods": "NM" },
-  { "beatmapId": 3048737, "mods": "NM" },
-  { "beatmapId": 3868554, "mods": "NM" },
-  { "beatmapId": 3868006, "mods": "NM" },
-  { "beatmapId": 3245938, "mods": "HD" },
-  { "beatmapId": 3241847, "mods": "HD" },
-  { "beatmapId": 3869010, "mods": "HD" },
-  { "beatmapId": 3769144, "mods": "HD" },
-  { "beatmapId": 1361845, "mods": "HR" },
-  { "beatmapId": 3503561, "mods": "HR" },
-  { "beatmapId": 3294612, "mods": "HR" },
-  { "beatmapId": 977875, "mods": "HR" },
-  { "beatmapId": 3880866, "mods": "DT" },
-  { "beatmapId": 1027019, "mods": "DT" },
-  { "beatmapId": 2204379, "mods": "DT" },
-  { "beatmapId": 1419974, "mods": "DT" },
-  { "beatmapId": 3873990, "mods": "TB" }
-]
+{
+  "maps": {
+    "NM": [
+      1296925,
+      635679,
+      4222042,
+      4099092,
+      3034033,
+      4190881
+    ],
+    "HD": [
+      319499,
+      56337,
+      2103984
+    ],
+    "HR": [
+      2690060,
+      37658,
+      2489209
+    ],
+    "DT": [
+      1544394,
+      1618984,
+      3169609
+    ],
+    "FM": [
+      4587898,
+      3934947,
+      2710484
+    ],
+    "TB": [
+      4140282
+    ]
+  }
+}

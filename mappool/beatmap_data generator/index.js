@@ -85,49 +85,49 @@ function difficultyCalculate(data, mod) {
 
 (async () => {
   const dataOut = [];
+  const poolTemp = dataJson.maps
+  for (const a of Object.entries(poolTemp)) {
 
-  for (const id of dataJson) {
-    console.log(
-      `Getting map details for ID = ${id.beatmapId} & mod = ${id.mods}`
-    );
-    const data = (
-      await axios.get(`/get_beatmaps`, {
-        baseURL: "https://osu.ppy.sh/api",
-        params: {
-          k: API_KEY,
-          b: id.beatmapId,
-          mods: getEnumValue(id.mods),
-        },
-      })
-    ).data[0];
+    for (let id of a[1]) {
+      console.log(
+        `Getting map details for ID = ${id} & mod = ${a[0]}`
+      );
+      const data = (
+        await axios.get(`/get_beatmaps`, {
+          baseURL: "https://osu.ppy.sh/api",
+          params: {
+            k: API_KEY,
+            b: id,
+            mods: getEnumValue(a[0]),
+          },
+        })
+      ).data[0];
+      const { cs, ar, od, bpm, drain } = difficultyCalculate(
+        data,
+        getEnumValue(a[0])
+      );
 
-    const { cs, ar, od, hp, bpm, drain, length } = difficultyCalculate(
-      data,
-      getEnumValue(id.mods)
-    );
-
-    dataOut.push({
-      mods: id.mods,
-      set_id: Number(data.beatmapset_id),
-      map_id: Number(data.beatmap_id),
-      artist: data.artist,
-      title: data.title,
-      diff_name: data.version,
-      mapper: data.creator,
-      cs: parseFloat(Number(cs).toFixed(1)),
-      ar: parseFloat(Number(ar).toFixed(1)),
-      od: parseFloat(Number(od).toFixed(1)),
-      drain: secondsToMMSS(drain),
-      bpm: Number(bpm),
-      sr: parseFloat(Number(data.difficultyrating).toFixed(2)),
-    });
+      dataOut.push({
+        mods: a[0],
+        set_id: Number(data.beatmapset_id),
+        map_id: Number(data.beatmap_id),
+        artist: data.artist,
+        title: data.title,
+        diff_name: data.version,
+        mapper: data.creator,
+        cs: parseFloat(Number(cs).toFixed(1)),
+        ar: parseFloat(Number(ar).toFixed(1)),
+        od: parseFloat(Number(od).toFixed(1)),
+        drain: secondsToMMSS(drain),
+        bpm: Number(bpm),
+        sr: parseFloat(Number(data.difficultyrating).toFixed(2)),
+      });
+    }
   }
-
   fs.writeFileSync(
     "./beatmap_data.json",
     JSON.stringify(dataOut, null, "\t"),
     "utf-8"
   );
-
   console.log("Successfully generated JSON data file");
 })();
