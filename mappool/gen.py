@@ -2,8 +2,8 @@ import json
 
 with open("mappool.txt", "r") as id_file:
     data = id_file.readlines()
-    print(data)
-    mod_count = int(data[0].strip())
+    data = [x.strip() for x in data if not x.startswith("#") and x.strip() != ""]
+    mod_count = int(data[0])
     mods = [x.split(" ") for x in data[1:mod_count + 1]]
 
 output_json = []
@@ -13,7 +13,7 @@ for mod in mods:
     count = int(mod[1])
     for i in range(count):
         output_json.append({
-            "beatmapId": int(data[index].strip()),
+            "beatmapId": int(data[index]),
             "mods": mod_name,
         })
         index += 1
