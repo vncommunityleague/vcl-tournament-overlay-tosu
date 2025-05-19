@@ -1,3 +1,5 @@
 .idea
 .env
 index.js
+mappool/beatmaps.json
+mappool/beatmap_data.json
