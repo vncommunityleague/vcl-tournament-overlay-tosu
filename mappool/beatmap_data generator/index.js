@@ -1,20 +1,24 @@
-// get your APIv1 key from https://osu.ppy.sh/home/account/edit#legacy-api
-const API_KEY = "your_api_key_goes_here";
+require('dotenv').config();
 
+// get your APIv1 key from https://osu.ppy.sh/home/account/edit#legacy-api
+const API_KEY = process.env.API_KEY;
 const axios = require("axios");
 const fs = require("fs");
 
-const dataJson = JSON.parse(fs.readFileSync("beatmaps.json"));
+const dataJson = JSON.parse(fs.readFileSync("../beatmaps.json"));
 
+// No SR change -> enum = 0
 const modEnums = {
   NM: 0,
   EZ: 2,
-  HD: 0,
+  HD: 8,
   HR: 16,
-  SD: 0,
+  SD: 32,
   DT: 64,
+  RX: 0,
   HT: 256,
-  FL: 0,
+  FL: 1024,
+  AP: 0,
   TB: 0,
 };
 
@@ -124,7 +128,7 @@ function difficultyCalculate(data, mod) {
   }
 
   fs.writeFileSync(
-    "./beatmap_data.json",
+    "../beatmap_data.json",
     JSON.stringify(dataOut, null, "\t"),
     "utf-8"
   );
