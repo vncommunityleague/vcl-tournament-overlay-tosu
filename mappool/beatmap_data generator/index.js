@@ -1,7 +1,6 @@
-require('dotenv').config();
-
 // get your APIv1 key from https://osu.ppy.sh/home/account/edit#legacy-api
-const API_KEY = process.env.API_KEY;
+const API_KEY = "your_api_key_goes_here";
+
 const axios = require("axios");
 const fs = require("fs");
 
