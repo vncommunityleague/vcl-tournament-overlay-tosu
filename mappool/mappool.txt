@@ -1,10 +1,13 @@
+# Mods count
 6
+# Format: [mod_name] [map_count]
 NM 7
 HR 4
 DT 4
 RX 3
 AP 3
 TB 1
+# Map IDs in mod order
 3430044
 3299406
 3623248
