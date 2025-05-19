@@ -131,8 +131,7 @@ let starsVisibleTemp;
 let team1 = "Red",
   team2 = "Blue";
 
-socket.onmessage = async (event) => {
-  let data = JSON.parse(event.data);
+socket.api_v2((data) => {
   const leftTeamName = data.tourney.team.left !== "" ? data.tourney.team.left: "Red Team";
   const rightTeamName = data.tourney.team.right !== "" ? data.tourney.team.right: "Blue Team";
 
@@ -156,7 +155,7 @@ socket.onmessage = async (event) => {
     teamNameRightTemp = rightTeamName;
     pickButtonB.innerHTML = teamNameRightTemp;
   }
-};
+});
 
 pickButtonR.addEventListener("click", () => {
   pickState.innerHTML = "First Team to pick: " + pickButtonR.innerHTML;
@@ -284,7 +283,7 @@ async function getDataSet(beatmapID) {
   }
 }
 
-pickedOnManual = (id) => {
+let pickedOnManual = (id) => {
   tempLastPick = tempLastPick === "Red" ? "Blue" : "Red";
   if (document.getElementById(`id-${id}-clicker`)) {
     let pickedStatus = document.getElementById(`id-${id}-status`);
