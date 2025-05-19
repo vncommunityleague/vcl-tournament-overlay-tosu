@@ -1,9 +1,11 @@
+import WebSocketManager from "./deps/socket.js";
+
 //TODO: remap variables from beatmap_data.json & check for maps not in mappool
 
 window.addEventListener("contextmenu", (e) => e.preventDefault());
 
 // START
-let socket = new ReconnectingWebSocket("ws://127.0.0.1:24050/ws");
+let socket = new WebSocketManager("127.0.0.1:24050");
 let axios = window.axios;
 let user = {};
 
@@ -30,19 +32,6 @@ let pickButtonB = document.getElementById("pickButtonB");
 let pickState = document.getElementById("pickState");
 
 const beatmaps = new Set(); // Store beatmapID;
-
-socket.onopen = () => {
-  console.log("Successfully Connected");
-};
-
-socket.onclose = (event) => {
-  console.log("Socket Closed Connection: ", event);
-  socket.send("Client Closed!");
-};
-
-socket.onerror = (error) => {
-  console.log("Socket Error: ", error);
-};
 
 let tempUID;
 
@@ -72,7 +61,9 @@ const mods = {
   HR: 2,
   DT: 3,
   FM: 4,
-  TB: 5,
+  RX: 4,
+  AP: 6,
+  TB: 7,
 };
 
 class Beatmap {
@@ -142,8 +133,8 @@ let team1 = "Red",
 
 socket.onmessage = async (event) => {
   let data = JSON.parse(event.data);
-  const leftTeamName = data.tourney.team?.left ?? "Red Team";
-  const rightTeamName = data.tourney.team?.right ?? "Blue Team";
+  const leftTeamName = data.tourney.team.left !== "" ? data.tourney.team.left: "Red Team";
+  const rightTeamName = data.tourney.team.right !== "" ? data.tourney.team.right: "Blue Team";
 
   if ((team1 !== leftTeamName && team2 !== rightTeamName) && (leftTeamName.length !== 0 && rightTeamName.length !== 0)) {
       team1 = leftTeamName;
@@ -152,8 +143,8 @@ socket.onmessage = async (event) => {
 
   if (!hasSetup) setupBeatmaps();
 
-  if (tempMapID !== data.menu.bm.id) {
-    tempMapID = data.menu.bm.id;
+  if (tempMapID !== data.beatmap.id) {
+    tempMapID = data.beatmap.id;
     pickedOnManual(tempMapID);
   }
 
@@ -186,6 +177,8 @@ async function setupBeatmaps() {
     HR: 0,
     DT: 0,
     FM: 0,
+    RX: 0,
+    AP: 0,
     TB: 0,
   };
 

@@ -1,7 +1,9 @@
+import WebSocketManager from "./deps/socket.js";
+
 // const queryString = window.location.search;
 // const urlParams = new URLSearchParams(queryString);
 
-let socket = new ReconnectingWebSocket("ws://127.0.0.1:24050/ws");
+let socket = new WebSocketManager("127.0.0.1:24050");
 let mapid = document.getElementById("mapid");
 let axios = window.axios;
 let user = {};
@@ -13,6 +15,8 @@ let stats = document.getElementById("mapStat");
 // TEAM OVERALL SCORE
 let teamLeftName = document.getElementById("teamLeftName");
 let teamRightName = document.getElementById("teamRightName");
+let containerLeft = document.getElementById("scoreContainerLeft");
+let containerRight = document.getElementById("scoreContainerRight");
 
 // TEAM PLAYING SCORE
 let playingScoreContainer = document.getElementById("playingScoreContainer");
@@ -40,10 +44,6 @@ let tempOverlayState = 0;
 // Main
 let main = document.getElementById("main");
 
-socket.onopen = () => {
-  console.log("Successfully Connected");
-};
-
 let animation = {
   playScoreLeft: new CountUp("playScoreLeft", 0, 0, 0, 0.2, {
     useEasing: true,
@@ -57,15 +57,6 @@ let animation = {
     separator: " ",
     decimal: ".",
   }),
-};
-
-socket.onclose = (event) => {
-  console.log("Socket Closed Connection: ", event);
-  socket.send("Client Closed!");
-};
-
-socket.onerror = (error) => {
-  console.log("Socket Error: ", error);
 };
 
 let bestOfTemp;
@@ -102,7 +93,7 @@ let leftScoreWidth, rightScoreWidth;
 let integratedMappool = 0;
 let tempIntegratedMappool;
 
-toMins = (time) => {
+let toMins = (time) => {
   let minutes =
     time.getUTCMinutes() >= 10
       ? time.getUTCMinutes()
@@ -131,22 +122,22 @@ let staticBeatmapsData = [];
   }
 })();
 
-socket.onmessage = (event) => {
-  let data = JSON.parse(event.data);
+socket.api_v2((data) => {
   setTimeout(() => {
     if (!mappoolSetup) {
       mappoolSetup = 1;
       iFrameInitiate();
     }
   }, 1000);
+  console.log(data.tourney.scoreVisible);
   if (
-    scoreVisibleTemp !== data.tourney.manager.bools.scoreVisible ||
+    scoreVisibleTemp !== data.tourney.scoreVisible ||
     tempOverlayState !== overlayState ||
     tempTournamentDebugger !== tournamentDebugger
   ) {
     tempTournamentDebugger = tournamentDebugger;
     if (tournamentDebugger === 0)
-      scoreVisibleTemp = data.tourney.manager.bools.scoreVisible;
+      scoreVisibleTemp = data.tourney.scoreVisible;
     else scoreVisibleTemp = true;
     tempOverlayState = overlayState;
     if (scoreVisibleTemp === true) {
@@ -175,8 +166,8 @@ socket.onmessage = (event) => {
       }
     }
   }
-  if (starsVisibleTemp !== data.tourney.manager.bools.starsVisible) {
-    starsVisibleTemp = data.tourney.manager.bools.starsVisible;
+  if (starsVisibleTemp !== data.tourney.starsVisible) {
+    starsVisibleTemp = data.tourney.starsVisible;
     if (starsVisibleTemp) {
       document.getElementById("scoreContainerLeft").style.opacity = "1";
       document.getElementById("scoreContainerRight").style.opacity = "1";
@@ -185,23 +176,23 @@ socket.onmessage = (event) => {
       document.getElementById("scoreContainerRight").style.opacity = "0";
     }
   }
-  if (tempImg !== data.menu.bm.path.full) {
-    tempImg = data.menu.bm.path.full;
-    data.menu.bm.path.full = data.menu.bm.path.full
+  if (tempImg !== data.directPath.beatmapBackground) {
+    tempImg = data.directPath.beatmapBackground;
+    data.directPath.beatmapBackground = data.directPath.beatmapBackground
       .replace(/#/g, "%23")
       .replace(/%/g, "%25")
       .replace(/\\/g, "/")
       .replace(/'/g, "%27");
     nowPlayingContainer.style.backgroundImage = `url('http://127.0.0.1:24050/Songs/${
-      data.menu.bm.path.full
+      data.directPath.beatmapBackground
     }?a=${Math.random(10000)}')`;
   }
   if (
-    tempMapID !== data.menu.bm.id
-    // tempSR !== data.menu.bm.stats.fullSR ||
-    // tempLength !== data.menu.bm.time.full
+    tempMapID !== data.beatmap.id
+    // tempSR !== data.beatmap.stats.fullSR ||
+    // tempLength !== data.beatmap.time.full
   ) {
-    const beatmapData = extractBeatmapData(data.menu.bm);
+    const beatmapData = extractBeatmapData(data.beatmap);
 
     tempMapID = beatmapData.map_id;
     tempMapArtist = beatmapData.artist;
@@ -234,10 +225,8 @@ socket.onmessage = (event) => {
       togglePool(false);
     }, 7270);
   }
-  if (bestOfTemp !== data.tourney.manager.bestOF) {
-    bestOfTemp = data.tourney.manager.bestOF;
-    containerLeft = document.getElementById("scoreContainerLeft");
-    containerRight = document.getElementById("scoreContainerRight");
+  if (bestOfTemp !== data.tourney.bestOF) {
+    bestOfTemp = data.tourney.bestOF;
     containerLeft.innerHTML = "";
     containerRight.innerHTML = "";
     for (var counter = 0; counter < Math.ceil(bestOfTemp / 2); counter++) {
@@ -252,8 +241,8 @@ socket.onmessage = (event) => {
       containerRight.appendChild(scoreRight[counter]);
     }
   }
-  if (scoreLeftTemp !== data.tourney.manager.stars.left) {
-    scoreLeftTemp = data.tourney.manager.stars.left;
+  if (scoreLeftTemp !== data.tourney.points.left) {
+    scoreLeftTemp = data.tourney.points.left;
     for (var i = 0; i < Math.ceil(bestOfTemp / 2); i++) {
       if (i < scoreLeftTemp) {
         scoreLeft[i].style.backgroundColor = "#fff";
@@ -263,8 +252,8 @@ socket.onmessage = (event) => {
     }
   }
 
-  if (scoreRightTemp !== data.tourney.manager.stars.right) {
-    scoreRightTemp = data.tourney.manager.stars.right;
+  if (scoreRightTemp !== data.tourney.points.right) {
+    scoreRightTemp = data.tourney.points.right;
     for (var i = 0; i < Math.ceil(bestOfTemp / 2); i++) {
       if (i < scoreRightTemp) {
         scoreRight[Math.ceil(bestOfTemp / 2) - 1 - i].style.backgroundColor =
@@ -277,16 +266,16 @@ socket.onmessage = (event) => {
   }
 
   if (
-    team1 !== data.tourney.manager.teamName.left &&
-    team2 !== data.tourney.manager.teamName.right
+    team1 !== data.tourney.team.left &&
+    team2 !== data.tourney.team.right
   ) {
     if (
-      data.tourney.manager.teamName.left !== "" &&
-      data.tourney.manager.teamName.right !== "" &&
+      data.tourney.team.left !== "" &&
+      data.tourney.team.right !== "" &&
       tournamentDebugger === 0
     ) {
-      team1 = data.tourney.manager.teamName.left;
-      team2 = data.tourney.manager.teamName.right;
+      team1 = data.tourney.team.left;
+      team2 = data.tourney.team.right;
     } else {
       team1 = "";
       team2 = "";
@@ -294,12 +283,12 @@ socket.onmessage = (event) => {
     avaSet = 0;
   }
 
-  if (teamNameLeftTemp !== data.tourney.manager.teamName.left) {
-    teamNameLeftTemp = data.tourney.manager.teamName.left;
+  if (teamNameLeftTemp !== data.tourney.team.left) {
+    teamNameLeftTemp = data.tourney.team.left;
     teamLeftName.innerHTML = teamNameLeftTemp;
   }
-  if (teamNameRightTemp !== data.tourney.manager.teamName.right) {
-    teamNameRightTemp = data.tourney.manager.teamName.right;
+  if (teamNameRightTemp !== data.tourney.team.right) {
+    teamNameRightTemp = data.tourney.team.right;
     teamRightName.innerHTML = teamNameRightTemp;
   }
 
@@ -311,9 +300,9 @@ socket.onmessage = (event) => {
 
   if (scoreVisibleTemp) {
     if (tournamentDebugger === 0) {
-      teamSize = data.tourney.ipcClients.length / 2;
-      playScoreLeftTemp = data.tourney.manager.gameplay.score.left;
-      playScoreRightTemp = data.tourney.manager.gameplay.score.right;
+      teamSize = data.tourney.clients.length / 2;
+      playScoreLeftTemp = data.tourney.totalScore.left;
+      playScoreRightTemp = data.tourney.totalScore.right;
       maximumDelta = teamSize * 1000000;
     } else {
       teamSize = 1;
@@ -388,12 +377,12 @@ socket.onmessage = (event) => {
     }
   }
   if (!scoreVisibleTemp && tournamentDebugger === 0) {
-    if (chatLen != data.tourney.manager.chat.length) {
+    if (chatLen != data.tourney.chat.length) {
       // There's new chats that haven't been updated
-      // console.log((data.tourney.manager.chat).length);
+      // console.log((data.tourney.chat).length);
       if (
         chatLen == 0 ||
-        (chatLen > 0 && chatLen > data.tourney.manager.chat.length)
+        (chatLen > 0 && chatLen > data.tourney.chat.length)
       ) {
         // Starts from bottom
         chats.innerHTML = "";
@@ -401,8 +390,8 @@ socket.onmessage = (event) => {
       }
 
       // Add the chats
-      for (var i = chatLen; i < data.tourney.manager.chat.length; i++) {
-        tempClass = data.tourney.manager.chat[i].team;
+      for (var i = chatLen; i < data.tourney.chat.length; i++) {
+        tempClass = data.tourney.chat[i].team;
 
         // Chat variables
         let chatParent = document.createElement("div");
@@ -417,11 +406,11 @@ socket.onmessage = (event) => {
         let chatText = document.createElement("div");
         chatText.setAttribute("class", "chatText");
 
-        chatTime.innerText = data.tourney.manager.chat[i].time;
-        chatName.innerText = data.tourney.manager.chat[i].name + ":\xa0";
-        chatText.innerText = data.tourney.manager.chat[i].messageBody;
+        chatTime.innerText = data.tourney.chat[i].time;
+        chatName.innerText = data.tourney.chat[i].name + ":\xa0";
+        chatText.innerText = data.tourney.chat[i].messageBody;
 
-        if (data.tourney.manager.chat[i].messageBody.includes("Next Pick"))
+        if (data.tourney.chat[i].messageBody.includes("Next Pick"))
           togglePool(true);
 
         chatName.classList.add(tempClass);
@@ -433,15 +422,13 @@ socket.onmessage = (event) => {
       }
 
       // Update the Length of chat
-      chatLen = data.tourney.manager.chat.length;
+      chatLen = data.tourney.chat.length;
 
       // Update the scroll so it's sticks at the bottom by default
       chats.scrollTop = chats.scrollHeight;
     }
-  } else {
-    togglePool(false);
   }
-};
+});
 
 async function setAvatar(element, username) {
   const data = await getDataSet(username);
@@ -515,20 +502,20 @@ function extractBeatmapData(beatmapData) {
 
   return {
     map_id: beatmapData.id,
-    artist: beatmapData.metadata.artist,
-    title: beatmapData.metadata.title,
-    diff_name: beatmapData.metadata.difficulty,
-    mapper: beatmapData.metadata.mapper,
-    cs: beatmapData.stats.CS,
-    ar: beatmapData.stats.AR,
-    od: beatmapData.stats.OD,
-    drain: beatmapData.time.full,
-    bpm: beatmapData.stats.BPM.common,
-    sr: beatmapData.stats.fullSR,
+    artist: beatmapData.artist,
+    title: beatmapData.title,
+    diff_name: beatmapData.difficulty,
+    mapper: beatmapData.mapper,
+    cs: beatmapData.stats.cs.converted,
+    ar: beatmapData.stats.ar.converted,
+    od: beatmapData.stats.od.converted,
+    drain: beatmapData.time.lastObject,
+    bpm: beatmapData.stats.bpm.common,
+    sr: beatmapData.stats.stars.total,
   };
 }
 
-togglePool = (state) => {
+let togglePool = (state) => {
   if (state) {
     overlayState = 1;
 
