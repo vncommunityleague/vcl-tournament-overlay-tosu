@@ -503,7 +503,7 @@ function extractBeatmapData(beatmapData) {
     map_id: beatmapData.id,
     artist: beatmapData.artist,
     title: beatmapData.title,
-    diff_name: beatmapData.difficulty,
+    diff_name: beatmapData.version,
     mapper: beatmapData.mapper,
     cs: beatmapData.stats.cs.converted,
     ar: beatmapData.stats.ar.converted,
