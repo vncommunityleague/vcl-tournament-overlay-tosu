@@ -129,7 +129,6 @@ socket.api_v2((data) => {
       iFrameInitiate();
     }
   }, 1000);
-  console.log(data.tourney.scoreVisible);
   if (
     scoreVisibleTemp !== data.tourney.scoreVisible ||
     tempOverlayState !== overlayState ||
